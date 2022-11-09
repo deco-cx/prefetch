@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "check": "deno fmt && deno lint && deno check mod.ts"
+  },
+  "importMap": "./import_map.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  }
+}
