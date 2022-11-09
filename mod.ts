@@ -1,10 +1,10 @@
 import { Plugin } from "$fresh/server.ts";
 
 export interface Options {
-  prefetch?: 'all' | 'by-attribute'
+  prefetch?: 'all'
 };
 
-const prefetch = ({ prefetch = 'all' }: Options): Plugin => {
+const prefetch = ({ prefetch }: Options = {}): Plugin => {
   const main = `data:application/javascript,export default function (state) {
     if (window.requestIdleCallback) {
       // prefetched links set
