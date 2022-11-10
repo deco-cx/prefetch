@@ -25,7 +25,7 @@ export interface Options {
 };
 
 const prefetch = (options: Options = {
-  throttle: 2
+  throttle: 4
 }): Plugin => {
   const main = `data:application/javascript,
     import { listen } from "https://esm.sh/quicklink@2.3.0";
