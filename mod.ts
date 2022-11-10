@@ -25,16 +25,36 @@ export interface Options {
 };
 
 const prefetch = (options: Options = {
-  throttle: 4
+  throttle: 4,
 }): Plugin => {
   const main = `data:application/javascript,
-    import { listen } from "https://esm.sh/quicklink@2.3.0";
+    import { listen, prefetch } from "https://esm.sh/quicklink@2.3.0";
 
-    export default function(options) {
+    const prefetchOnViewport = (options) => {
       if (document.readyState === "complete" || document.readyState === "loaded"  || document.readyState === "interactive") {
         listen(options);
       } else {
         document.addEventListener("DOMContentLoaded", () => listen(options));
+      }
+    };
+
+    const prefetchOnMouseOver = (options) => {
+      const origins = options.origins || [location.hostname];
+
+      document.querySelectorAll('a').forEach((a) => {
+        if (Array.isArray(origins) && origins.includes(a.hostname)) {
+          a.addEventListener("mouseover", () => prefetch(a.href));
+        }
+      });
+    };
+
+    export default function(options) {
+      const hasMouse = matchMedia('(pointer:fine)').matches;
+
+      if (!hasMouse) {
+        prefetchOnViewport(options);
+      } else {
+        prefetchOnMouseOver(options);
       }
     };`
 
