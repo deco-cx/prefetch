@@ -1,5 +1,5 @@
 # Prefetch for Fresh
-Google's [quicklink](https://github.com/GoogleChromeLabs/quicklink) plugin for Fresh.
+Fresh plugin for prefetching pages powered by Google's [quicklink](https://github.com/GoogleChromeLabs/quicklink).
 
 According to [Google's web development guidelines](https://web.dev/link-prefetch/), prefetching leads to faster load times, resulting in higher conversion rates and better user experiences. Prefetching can be implemented [using the link](https://web.dev/codelab-two-ways-to-prefetch/) tag. 
 
@@ -7,12 +7,17 @@ According to [Google's web development guidelines](https://web.dev/link-prefetch
 
 To use this plugin, just add to your fresh config:
 ```ts
-import prefetchPlugin from 'https://deno.land/x/prefetch'
+import prefetchPlugin, { Options } from 'https://deno.land/x/prefetch'
+
+const options: Options = {
+  throttle: 4 // 4 concurrent requests
+  // ...
+}
 
 await start(manifest, {
   ...
   plugins: [
-    prefetchPlugin(),
+    prefetchPlugin(options),
   ],
 });
 ```
