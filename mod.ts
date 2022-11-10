@@ -1,39 +1,42 @@
 import { Plugin } from "$fresh/server.ts";
 
 export interface Options {
-  prefetch?: 'all'
+  /** Attempt higher priority fetch (low or high) */
+  priority?: boolean
+  /** Allowed origins to prefetch (empty allows all) */
+  origins?: string[]
+  /** Timeout after which prefetching will occur */
+  timeout?: number
+  /** 
+   * The concurrency limit for prefetching 
+   * @default 2
+   * */
+  throttle?: number
+  /** The area percentage of each link that must have entered the viewport to be fetched */
+  threshold?: number
+  /** The total number of prefetches to allow */
+  limit?: number
+  /** Time each link needs to stay inside viewport before prefetching (milliseconds) */
+  delay?: number
+  /** Option to switch from prefetching and use prerendering only */
+  prerender?: boolean
+  /** Option to use both prerendering and prefetching */
+  prerenderAndPrefetch?: boolean
 };
 
-const prefetch = ({ prefetch }: Options = {}): Plugin => {
-  const main = `data:application/javascript,export default function (state) {
-    if (window.requestIdleCallback) {
-      // prefetched links set
-      const prefetched = new Set();
+const prefetch = (options: Options = {
+  throttle: 2
+}): Plugin => {
+  const main = `data:application/javascript,
+    import { listen } from "https://esm.sh/quicklink@2.3.0";
 
-      // only prefetch relative links
-      const isRelativeUrl = (href) => typeof href === "string" && !/^http(s)?:\/\/|#/.test(href);
-
-      const createPrefetchLink = (href) => {
-        console.log('Prefetchig', href);
-        const linkTag = document.createElement('link');
-        linkTag.rel = 'prefetch';
-        linkTag.href = href;
-        linkTag.as = 'document';
-        document.head.appendChild(linkTag);
-      };
-  
-      window.requestIdleCallback(() => {
-        document.querySelectorAll("${prefetch === 'all' ? "a" : "a[prefetch]"}").forEach((element) => {
-          const href = element.getAttribute("href");
-  
-          if (isRelativeUrl(href) && prefetched.has(href) === false) {
-            prefetched.add(href);
-            createPrefetchLink(href);
-          }
-        })
-      });
-    }
-  }`
+    export default function(options) {
+      if (document.readyState === "complete" || document.readyState === "loaded"  || document.readyState === "interactive") {
+        listen(options);
+      } else {
+        document.addEventListener("DOMContentLoaded", () => listen(options));
+      }
+    };`
 
   return {
     name: 'prefetch',
@@ -42,7 +45,7 @@ const prefetch = ({ prefetch }: Options = {}): Plugin => {
       ctx.render()
 
       return {
-        scripts: [{ entrypoint: 'main', state: {} }]
+        scripts: [{ entrypoint: 'main', state: options }]
       }
     }
   }
