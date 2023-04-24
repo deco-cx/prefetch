@@ -27,18 +27,21 @@ export interface Options {
    *
    * set opt-in to prefetch only anchor tags containing the data-prefetch attribute
    * set opt-out to ignore only those links with the data-noprefetch attribute
+   * set manual to disable listening and fallback to calling prefetch manually
    * set aggresive to prefetch all links
    *
    * @default undefined
    */
-  strategy?: "opt-in" | "opt-out";
+  strategy?: "opt-in" | "opt-out" | "manual";
 }
 
 const prefetch = (options: Options = {
   throttle: 10,
 }): Plugin => {
   const main = `data:application/javascript,
-    import { listen as qlListen } from "https://esm.sh/quicklink@2.3.0";
+    import * as quicklink from "https://esm.sh/quicklink@2.3.0";
+
+    window.quicklink = quicklink;
 
     function getOptions (options) {
       if (options.strategy) {
@@ -54,10 +57,14 @@ const prefetch = (options: Options = {
     };
 
     function listen (options) {
-      return qlListen(getOptions(options))
+      return quicklink.listen(getOptions(options))
     };
 
     export default function(options) {
+      if (options.strategy === "manual") {
+        return;
+      }
+
       if (document.readyState === "complete" || document.readyState === "loaded"  || document.readyState === "interactive") {
         listen(options);
       } else {
