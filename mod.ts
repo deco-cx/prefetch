@@ -39,9 +39,9 @@ const prefetch = (options: Options = {
   throttle: 10,
 }): Plugin => {
   const main = `data:application/javascript,
-    import * as QuickLink from "https://esm.sh/quicklink@2.3.0";
+    import * as quicklink from "https://esm.sh/quicklink@2.3.0";
 
-    window.QuickLink = QuickLink;
+    window.quicklink = quicklink;
 
     function getOptions (options) {
       if (options.strategy) {
@@ -57,7 +57,7 @@ const prefetch = (options: Options = {
     };
 
     function listen (options) {
-      return QuickLink.listen(getOptions(options))
+      return quicklink.listen(getOptions(options))
     };
 
     export default function(options) {
