@@ -61,5 +61,8 @@ all links but those containing `data-noprefetch`. For instance
 
 will prefetch `/bar`.
 
+`manual` disables listening and requires you to call `window.QuickLink.prefetch`
+manually
+
 Not setting `options.strategy` will make this plugin fallback to the usual
 quicklink's behavior, i.e. viewport based prefetching
